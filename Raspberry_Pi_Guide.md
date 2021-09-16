@@ -1,4 +1,4 @@
-# Part 2 - How to Run TensorFlow Lite Object Detection Models on the Raspberry Pi (with Optional Coral USB Accelerator)
+# How to Run TensorFlow Lite Object Detection Models on the Raspberry Pi (with Optional Coral USB Accelerator)
 
 <p align="center">
    <img src="doc/TFLite-vs-EdgeTPU.gif">
@@ -7,19 +7,12 @@
 ## Introduction
 This guide provides step-by-step instructions for how to set up TensorFlow Lite on the Raspberry Pi and use it to run object detection models. It also shows how to set up the Coral USB Accelerator on the Pi and run Edge TPU detection models. It works for the Raspberry Pi 3 and Raspberry Pi 4 running either Rasbpian Buster or Rasbpian Stretch.
 
-This guide is the second part of my larger TensorFlow Lite tutorial series:
+TensorFlow Lite (TFLite) models run much faster than regular TensorFlow models on the Raspberry Pi. '
 
-1. [How to Train, Convert, and Run Custom TensorFlow Lite Object Detection Models on Windows 10](https://github.com/EdjeElectronics/TensorFlow-Lite-Object-Detection-on-Android-and-Raspberry-Pi#part-1---how-to-train-convert-and-run-custom-tensorflow-lite-object-detection-models-on-windows-10)
-2. How to Run TensorFlow Lite Object Detection Models on the Raspberry Pi (with Optional Coral USB Accelerator) *<--- You are here!*
-3. How to Run TensorFlow Lite Object Detection Models on Android Devices
-
-TensorFlow Lite (TFLite) models run much faster than regular TensorFlow models on the Raspberry Pi. You can see a comparison of framerates obtained using regular TensorFlow, TensorFlow Lite, and Coral USB Accelerator models in my [TensorFlow Lite Performance Comparison YouTube video](https://www.youtube.com/watch?v=TiOKvOrYNII).
-
-This portion of the guide is split in to three sections:
+This portion of the guide is split in to two sections:
 
 * [Section 1. Run TensorFlow Lite Object Detection Models on the Raspberry Pi](https://github.com/EdjeElectronics/TensorFlow-Lite-Object-Detection-on-Android-and-Raspberry-Pi/blob/master/Raspberry_Pi_Guide.md#part-1---how-to-set-up-and-run-tensorflow-lite-object-detection-models-on-the-raspberry-pi)
 * [Section 2. Run Edge TPU Object Detection Models on the Raspberry Pi Using the Coral USB Accelerator](https://github.com/EdjeElectronics/TensorFlow-Lite-Object-Detection-on-Android-and-Raspberry-Pi/blob/master/Raspberry_Pi_Guide.md#section-2---run-edge-tpu-object-detection-models-on-the-raspberry-pi-using-the-coral-usb-accelerator)
-* [Section 3. Compile Custom Edge TPU Object Detection Models](https://github.com/EdjeElectronics/TensorFlow-Lite-Object-Detection-on-Android-and-Raspberry-Pi/blob/master/Raspberry_Pi_Guide.md#section-2---run-edge-tpu-object-detection-models-on-the-raspberry-pi-using-the-coral-usb-accelerator)
 
 This repository also includes scripts for running the TFLite and Edge TPU models on images, videos, or webcam/Picamera feeds.
 
@@ -56,19 +49,19 @@ While we're at it, let's make sure the camera interface is enabled in the Raspbe
 Next, clone this GitHub repository by issuing the following command. The repository contains the scripts we'll use to run TensorFlow Lite, as well as a shell script that will make installing everything easier. Issue:
 
 ```
-git clone https://github.com/EdjeElectronics/TensorFlow-Lite-Object-Detection-on-Android-and-Raspberry-Pi.git
+git clone https://github.com/jodfie/TF-Lite-Pi.git
 ```
 
-This downloads everything into a folder called TensorFlow-Lite-Object-Detection-on-Android-and-Raspberry-Pi. That's a little long to work with, so rename the folder to "tflite1" and then cd into it:
+This downloads everything into a folder called TF-Lite-Pi. That's a little long to work with, so rename the folder to "tflitepi" and then cd into it:
 
 ```
-mv TensorFlow-Lite-Object-Detection-on-Android-and-Raspberry-Pi tflite1
-cd tflite1
+mv TF-Lite-Pi tflitepi
+cd tflitepi
 ```
 
-We'll work in this /home/pi/tflite1 directory for the rest of the guide. Next up is to create a virtual environment called "tflite1-env".
+We'll work in this /home/pi/tflitepi directory for the rest of the guide. Next up is to create a virtual environment called "tflitepi-env".
 
-I'm using a virtual environment for this guide because it prevents any conflicts between versions of package libraries that may already be installed on your Pi. Keeping TensorFlow installed in its own environment allows us to avoid version conflicts. For example, if you've already installed TensorFlow v1.8 on the Pi using my [other guide](https://www.youtube.com/watch?v=npZ-8Nj1YwY), you can leave that installation as-is without having to worry about overriding it.
+I'm using a virtual environment for this guide because it prevents any conflicts between versions of package libraries that may already be installed on your Pi. Keeping TensorFlow installed in its own environment allows us to avoid version conflicts.
 
 Install virtualenv by issuing:
 
@@ -76,21 +69,21 @@ Install virtualenv by issuing:
 sudo pip3 install virtualenv
 ```
 
-Then, create the "tflite1-env" virtual environment by issuing:
+Then, create the "tflitepi-env" virtual environment by issuing:
 
 ```
-python3 -m venv tflite1-env
+python3 -m venv tflitepi-env
 ```
 
-This will create a folder called tflite1-env inside the tflite1 directory. The tflite1-env folder will hold all the package libraries for this environment. Next, activate the environment by issuing:
+This will create a folder called tflitepi-env inside the tflite1pi directory. The tflitepi-env folder will hold all the package libraries for this environment. Next, activate the environment by issuing:
 
 ```
-source tflite1-env/bin/activate
+source tflitepi-env/bin/activate
 ```
 
-**You'll need to issue the `source tflite1-env/bin/activate` command from inside the /home/pi/tflite1 directory to reactivate the environment every time you open a new terminal window. You can tell when the environment is active by checking if (tflite1-env) appears before the path in your command prompt, as shown in the screenshot below.**
+**You'll need to issue the `source tflitepi-env/bin/activate` command from inside the /home/pi/tflitepi directory to reactivate the environment every time you open a new terminal window. You can tell when the environment is active by checking if (tflitepi-env) appears before the path in your command prompt, as shown in the screenshot below.**
 
-At this point, here's what your tflite1 directory should look like if you issue `ls`.
+At this point, here's what your tflitepi directory should look like if you issue `ls`.
 
 <p align="center">
   <img src="/doc/tflite1_folder.png">
@@ -107,7 +100,7 @@ To make things easier, I wrote a shell script that will automatically download a
 bash get_pi_requirements.sh
 ```
 
-This downloads about 400MB worth of installation files, so it will take a while. Go grab a cup of coffee while it's working! If you'd like to see everything that gets installed, simply open get_pi_dependencies.sh to view the list of packages.
+This downloads about 400MB worth of installation files, so it will take a while. Go grab a cup of coffee while it's working! If you'd like to see everything that gets installed, simply open `get_pi_dependencies.sh` to view the list of packages.
 
 **NOTE: If you get an error while running the `bash get_pi_requirements.sh` command, it's likely because your internet connection timed out, or because the downloaded package data was corrupted. If you get an error, try re-running the command a few more times.**
 
@@ -153,9 +146,6 @@ It's time to see the TFLite object detection model in action! First, free up mem
 
 Run the real-time webcam detection script by issuing the following command from inside the /home/pi/tflite1 directory. (Before running the command, make sure the tflite1-env environment is active by checking that (tflite1-env) appears in front of the command prompt.) **The TFLite_detection_webcam.py script will work with either a Picamera or a USB webcam.**
 
-*Note: You may get a `cannot connect to X server` error if you try to execute below step using SSH. If you are working with pi in headless mode, you may use VNC to view the remote desktop.\
-Once logged in, use the terminal to execute below script*
-
 ```
 python3 TFLite_detection_webcam.py --modeldir=Sample_TFLite_model
 ```
@@ -170,7 +160,7 @@ Part 3 of my TensorFlow Lite training guide gives [instructions](https://github.
 
 [![Link to Section 2 YouTube video!](https://raw.githubusercontent.com/EdjeElectronics/TensorFlow-Lite-Object-Detection-on-Android-and-Raspberry-Pi/master/doc/YouTube_video2.png)](https://www.youtube.com/watch?v=qJMwNHQNOVU)
 
-The [Coral USB Accelerator](https://coral.withgoogle.com/products/accelerator/) is a USB hardware accessory for speeding up TensorFlow models. You can buy one [here (Amazon Associate link)](https://amzn.to/2BuG1Tv). 
+The [Coral USB Accelerator](https://coral.withgoogle.com/products/accelerator/) is a USB hardware accessory for speeding up TensorFlow models. You can buy one on amazon. 
 
 The USB Accelerator uses the Edge TPU (tensor processing unit), which is an ASIC (application-specific integrated circuit) chip specially designed with highly parallelized ALUs (arithmetic logic units). While GPUs (graphics processing units) also have many parallelized ALUs, the TPU has one key difference: the ALUs are directly connected to eachother. The output of one ALU can be directly passed to the input of the next ALU without having to be stored and retrieved from a memory buffer. The extreme paralellization and removal of the memory bottleneck means the TPU can perform up to 4 trillion arithmetic operations per second! This is perfect for running deep neural networks, which require millions of multiply-accumulate operations to generate outputs from a single batch of input data. 
 
@@ -178,7 +168,7 @@ The USB Accelerator uses the Edge TPU (tensor processing unit), which is an ASIC
   <img src="/doc/Coral_and_EdgeTPU2.png">
 </p>
 
-My Master's degree was in ASIC design, so the Edge TPU is very interesting to me! If you're a computer architecture nerd like me and want to learn more about the Edge TPU, [here is a great article that explains how it works](https://cloud.google.com/blog/products/ai-machine-learning/what-makes-tpus-fine-tuned-for-deep-learning).
+If you're a computer architecture nerd like me and want to learn more about the Edge TPU, [here is a great article that explains how it works](https://cloud.google.com/blog/products/ai-machine-learning/what-makes-tpus-fine-tuned-for-deep-learning).
 
 It makes object detection models run WAY faster, and it's easy to set up. These are the steps we'll go through to set up the Coral USB Accelerator:
 
@@ -191,11 +181,11 @@ This section of the guide assumes you have already completed [Section 1](https:/
 ### Step 2a. Install libedgetpu library
 First, we'll download and install the Edge TPU runtime, which is the library needed to interface with the USB Acccelerator. These instructions follow the [USB Accelerator setup guide](https://coral.withgoogle.com/docs/accelerator/get-started/) from official Coral website.
 
-Open a command terminal and move into the /home/pi/tflite1 directory and activate the tflite1-env virtual environment by issuing:
+Open a command terminal and move into the /home/pi/tflitepi directory and activate the tflitepi-env virtual environment by issuing:
 
 ```
-cd /home/pi/tflite1
-source tflite1-env/bin/activate
+cd /home/pi/tflitepi
+source tflitepi-env/bin/activate
 ```
 
 Add the Coral package repository to your apt-get distribution list by issuing the following commands:
@@ -252,9 +242,8 @@ Now that everything is set up, it's time to test out the Coral's ultra-fast dete
 
 Plug in your Coral USB Accelerator into one of the USB ports on the Raspberry Pi. If you're using a Pi 4, make sure to plug it in to one of the blue USB 3.0 ports.
 
-*Insert picture of Coral USB Accelerator plugged into Raspberry Pi here!*
 
-Make sure the tflite1-env environment is activate by checking that (tflite1-env) appears in front of the command prompt in your terminal. Then, run the real-time webcam detection script with the --edgetpu argument:
+Make sure the tflitepi-env environment is activate by checking that (tflitepi-env) appears in front of the command prompt in your terminal. Then, run the real-time webcam detection script with the --edgetpu argument:
 
 ```
 python3 TFLite_detection_webcam.py --modeldir=Sample_TFLite_model --edgetpu
